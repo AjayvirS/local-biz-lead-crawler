@@ -1,10 +1,14 @@
 directories:
-  - name: "example_directory"
+  - name: "Herold"
     start_urls:
-      - "https://example.com/directory/page1"
+      - "https://www.herold.at/gelbe-seiten/wien/elektriker/"
+      - "https://www.herold.at/gelbe-seiten/wien/friseur/"
+      - "https://www.herold.at/gelbe-seiten/wien/installateur/"
+      - "https://www.herold.at/gelbe-seiten/restaurant/"
     pagination:
       type: "next_link"
       selector: "a[rel='next']"
     rules:
-      # optional: only keep outgoing links whose anchor text or surrounding element contains these words
-      include_text_hints: ["Website", "Web", "Homepage"]
+      include_text_hints: ["Website", "Web", "Homepage", "Webseite"]
+    max_pages: 30
+    delay_seconds: 1.0
