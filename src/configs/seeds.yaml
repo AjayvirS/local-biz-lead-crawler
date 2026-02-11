@@ -5,10 +5,13 @@ directories:
       - "https://www.herold.at/gelbe-seiten/wien/friseur/"
       - "https://www.herold.at/gelbe-seiten/wien/installateur/"
       - "https://www.herold.at/gelbe-seiten/restaurant/"
+    mode: "detail_then_external"
+    detail_link_selector: "a[href^='/gelbe-seiten/']"
+    external_link_selectors:
+      - "a[target='_blank'][href^='http']"
     pagination:
       type: "next_link"
       selector: "a[rel='next']"
-    rules:
-      include_text_hints: ["Website", "Web", "Homepage", "Webseite"]
-    max_pages: 30
-    delay_seconds: 1.0
+    max_pages: 3
+    delay_seconds: 1.2
+    max_detail_pages_per_listing: 20
