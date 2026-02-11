@@ -2,10 +2,10 @@ import csv
 import sqlite3
 from pathlib import Path
 
-DB = "data/leads.sqlite"
-OUT = "data/discovered.csv"
+DB = "src/data/leads.sqlite"
+OUT = "src/data/discovered.csv"
 
-Path("data").mkdir(exist_ok=True)
+Path("src/data").mkdir(exist_ok=True)
 
 con = sqlite3.connect(DB)
 rows = con.execute(
