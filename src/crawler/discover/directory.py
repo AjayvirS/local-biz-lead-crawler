@@ -9,7 +9,7 @@ import httpx
 import tldextract
 from bs4 import BeautifulSoup
 
-# Registrable domains (tldextract) to skip as non-business targets.
+# Registrable junk domains to skip as non-business targets.
 SOCIAL_OR_JUNK_DOMAINS = {
     "facebook.com",
     "instagram.com",
@@ -23,7 +23,7 @@ SOCIAL_OR_JUNK_DOMAINS = {
     "bit.ly",
 }
 
-# Extra string-based filters (useful for things that aren’t nicely “registrable domains”)
+# Extra string-based filters
 SOCIAL_OR_JUNK_SUBSTRINGS = (
     "facebook.com",
     "instagram.com",
@@ -50,15 +50,13 @@ class DirectoryConfig:
     start_urls: list[str]
 
     # Listing pagination
-    pagination_selector: Optional[str] = None  # e.g. "a[rel='next']"
+    pagination_selector: Optional[str] = None 
     max_pages: int = 50
     delay_seconds: float = 0.8
 
-    # MODE 1: Extract external sites directly from listing page
-    # Optional “text hints” to reduce false positives (e.g. ["Website", "Webseite"])
+
     include_text_hints: Optional[list[str]] = None
 
-    # MODE 2: Listing → Detail → External (needed for Herold-like directories)
     mode: str = "external_from_listing"  # or "detail_then_external"
     detail_link_selector: str | None = None
     external_link_selectors: list[str] | None = None
@@ -125,7 +123,6 @@ def _extract_outgoing_links(
 
         abs_url = urljoin(base_url, href)
 
-        # Optional hinting: keep only anchors that *look like* website links
         # IMPORTANT: This is a soft filter; we only skip when hints exist and anchor text clearly doesn't match.
         if include_text_hints:
             anchor_text = " ".join(a.get_text(" ", strip=True).split()).lower()
@@ -246,7 +243,6 @@ async def crawl_directory(cfg: DirectoryConfig) -> list[tuple[str, str]]:
                         seen_pairs.add(pair)
                         results.append(pair)
 
-            # MODE 2: listing → detail pages → external business sites
             elif cfg.mode == "detail_then_external":
                 if not cfg.detail_link_selector:
                     raise ValueError(
@@ -255,10 +251,8 @@ async def crawl_directory(cfg: DirectoryConfig) -> list[tuple[str, str]]:
 
                 detail_urls = _select_links(html, url, cfg.detail_link_selector)
 
-                # Keep only directory-domain detail pages (e.g., herold.at)
                 detail_urls = {d for d in detail_urls if _registrable_domain(d) == directory_domain}
 
-                # Fetch detail pages and extract external websites
                 for durl in list(detail_urls)[: cfg.max_detail_pages_per_listing]:
                     print(f"  → detail: {durl}")
                     try:
@@ -286,7 +280,6 @@ async def crawl_directory(cfg: DirectoryConfig) -> list[tuple[str, str]]:
             else:
                 raise ValueError(f"Unknown cfg.mode: {cfg.mode}")
 
-            # Pagination (listing pages)
             next_url = _extract_next_page(html, url, cfg.pagination_selector)
             if next_url and next_url not in seen_pages:
                 queue.append(next_url)
