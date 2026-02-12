@@ -41,6 +41,14 @@ CREATE TABLE IF NOT EXISTS site_analysis (
   reasons_json TEXT,
   analyzed_at TEXT DEFAULT (datetime('now'))
 );
+
+CREATE TABLE IF NOT EXISTS llm_insights (
+  url TEXT PRIMARY KEY,
+  bullets_json TEXT,
+  email_opener TEXT,
+  model TEXT,
+  generated_at TEXT DEFAULT (datetime('now'))
+);
 """
 
 

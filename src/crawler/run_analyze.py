@@ -22,8 +22,12 @@ async def analyze_site(client: httpx.AsyncClient, store: Store, url: str) -> Non
         status = r.status_code
         final_url = str(r.url)
         html = r.text
-    except Exception:
-        store.log_fetch(url, None, None, "fetch_failed")
+        if "text/html" not in ct and "application/xhtml" not in ct:
+            ct = (r.headers.get("content-type") or "").lower()
+            store.log_fetch(url, r.status_code, str(r.url), f"non_html:{ct}")
+
+    except Exception as e:
+        store.log_fetch(url, None, None, f"fetch_failed:{type(e).__name__}:{e}")
         return
 
     title = extract_title(html)
